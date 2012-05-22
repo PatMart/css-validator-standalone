@@ -19,4 +19,4 @@ and
 ant war
 
 # stages the WAR so that it's part of the SBT project
-cp 2002/css-validator/css-validator.war /src/main/resources
+cp 2002/css-validator/css-validator.war src/main/resources
