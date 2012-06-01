@@ -12,10 +12,13 @@ import java.nio.file._
  * http://download.eclipse.org/jetty/stable-8/apidocs/
  * http://wiki.eclipse.org/Jetty/Tutorial/Embedding_Jetty
  */
-object JettyMain {
+class CSSValidator(port: Int) {
+
+  val server: Server = new Server
+
+  def stop(): Unit = server.stop()
   
-  def main(args: Array[String]): Unit = {
-    val server: Server = new Server
+  def start(): Unit = {
 
     server setGracefulShutdown 500
     server setSendServerVersion false
@@ -23,7 +26,7 @@ object JettyMain {
     server setStopAtShutdown true
 
     val connector = new SelectChannelConnector
-    connector setPort 8080
+    connector setPort port
     connector setMaxIdleTime 90000
     server addConnector connector
 
@@ -45,5 +48,23 @@ object JettyMain {
     server setHandler webapp
 
     server.start()
+
+  }
+}
+
+object JettyMain {
+
+  def main(args: Array[String]): Unit = {
+
+    val port = args.toList.headOption.map(_.toInt) getOrElse 8080
+
+    val cssval = new CSSValidator(port)
+
+    cssval.start()
+
+    println(">> press Enter to stop")
+    scala.Console.readLine()
+
+    cssval.stop()
   }
 }
