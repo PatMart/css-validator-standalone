@@ -19,6 +19,15 @@ How to run the CSS Validator
 
 Then go to [http://localhost:8080](http://localhost:8080).
 
+How to generate a standalone jar
+--------------------------------
+
+    ./sbt assembly
+
+Then you can do the following:
+
+    java -jar target/css-validator-standalone.jar 8080
+
 Licence
 -------
 
