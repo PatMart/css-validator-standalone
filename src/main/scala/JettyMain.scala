@@ -30,14 +30,20 @@ class CSSValidator(port: Int) {
     connector setMaxIdleTime 90000
     server addConnector connector
 
+    // the path to the war file
+    // first, tries to see if this is running from sbt
+    // if it's not, we assume we are in the jar and that the war is available there
     val warPath: String = {
       val sbtPath = "src/main/resources/css-validator.war"
       if (Paths.get(sbtPath).toFile.exists) {
         sbtPath
       } else {
         val tmpPath = Paths.get(java.lang.System.getProperty("java.io.tmpdir")).resolve("css-validator.war")
-        val is: InputStream = getClass().getResourceAsStream("/css-validator.war")
-        Files.copy(is, tmpPath)
+        // this extracts the war file and make it available in the tmp directory
+        if (! tmpPath.toFile.exists) {
+          val is: InputStream = getClass().getResourceAsStream("/css-validator.war")
+          Files.copy(is, tmpPath)
+        }
         tmpPath.toString
       }
     }
