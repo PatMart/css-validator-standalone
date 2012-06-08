@@ -15,8 +15,9 @@ cvs get 2002/css-validator
 
 # build the WAR file
 cd 2002/css-validator
-and
+ant
 ant war
 
 # stages the WAR so that it's part of the SBT project
+cd ../..
 cp 2002/css-validator/css-validator.war src/main/resources
