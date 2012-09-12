@@ -13,7 +13,7 @@ object CSSValidator extends Build {
     base = file("."),
     settings = Defaults.defaultSettings ++ assemblySettings ++ Seq(
       organization := "org.w3",
-      version := "1.0",
+      version := "1.1-SNAPSHOT",
       scalaVersion := "2.9.2",
       crossScalaVersions := Seq("2.9.2"),
       javacOptions ++= Seq("-Xlint:unchecked"),
