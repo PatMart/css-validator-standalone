@@ -5,8 +5,6 @@ import org.eclipse.jetty.server.nio.SelectChannelConnector
 import org.eclipse.jetty.server.handler.ContextHandlerCollection
 import org.eclipse.jetty.webapp.WebAppContext
 import org.eclipse.jetty.servlet.{ DefaultServlet, ServletContextHandler, ServletHolder }
-import org.eclipse.jetty.util.component.LifeCycle
-import java.util.concurrent.CountDownLatch
 import java.io._
 import java.nio.file._
 
@@ -58,20 +56,25 @@ class CSSValidator(port: Int) {
     webapp.setWar(warPath)
     server.setHandler(webapp)
 
-    val cdl = new CountDownLatch(1)
-
-    val listener = new LifeCycle.Listener {
-      def lifeCycleFailure(event: LifeCycle, cause: Throwable): Unit = ()
-      def lifeCycleStarted(event: LifeCycle): Unit = cdl.countDown()
-      def lifeCycleStarting(event: LifeCycle): Unit = ()
-      def lifeCycleStopped(event: LifeCycle): Unit = ()
-      def lifeCycleStopping(event: LifeCycle): Unit = ()
-    }
-
-    server.addLifeCycleListener(listener)
     server.start()
-    cdl.await()
 
+    /**
+     * wait until the server is really started
+     * followed https://github.com/sonatype/sisu-jetty-testsuite/pull/1
+     */
+    val start = System.currentTimeMillis()
+    var success = false
+    while ( !success && System.currentTimeMillis() - start < 10000 ) {
+      try {
+        val socket = new java.net.Socket("127.0.0.1", port)
+        socket.close()
+        success = true
+      } catch { case t =>
+        Thread.sleep(500)
+      }
+    }
+    if (!success)
+      throw new IllegalStateException("Port %d did not open in 10s" format port)
   }
 }
 
