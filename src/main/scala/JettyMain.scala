@@ -1,10 +1,12 @@
 package org.w3.cssvalidator
 
+import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.nio.SelectChannelConnector
-import org.eclipse.jetty.server.{ Server }
 import org.eclipse.jetty.server.handler.ContextHandlerCollection
 import org.eclipse.jetty.webapp.WebAppContext
 import org.eclipse.jetty.servlet.{ DefaultServlet, ServletContextHandler, ServletHolder }
+import org.eclipse.jetty.util.component.LifeCycle
+import java.util.concurrent.CountDownLatch
 import java.io._
 import java.nio.file._
 
@@ -16,19 +18,22 @@ class CSSValidator(port: Int) {
 
   val server: Server = new Server
 
-  def stop(): Unit = server.stop()
+  def stop(): Unit = {
+    server.stop()
+    server.join()
+  }
   
   def start(): Unit = {
 
-    server setGracefulShutdown 500
-    server setSendServerVersion false
-    server setSendDateHeader true
-    server setStopAtShutdown true
+    server.setGracefulShutdown(500)
+    server.setSendServerVersion(false)
+    server.setSendDateHeader(true)
+    server.setStopAtShutdown(true)
 
     val connector = new SelectChannelConnector
-    connector setPort port
-    connector setMaxIdleTime 90000
-    server addConnector connector
+    connector.setPort(port)
+    connector.setMaxIdleTime(90000)
+    server.addConnector(connector)
 
     // the path to the war file
     // first, tries to see if this is running from sbt
@@ -49,11 +54,23 @@ class CSSValidator(port: Int) {
     }
 
     val webapp = new WebAppContext
-    webapp setContextPath "/"
-    webapp setWar warPath
-    server setHandler webapp
+    webapp.setContextPath("/")
+    webapp.setWar(warPath)
+    server.setHandler(webapp)
 
+    val cdl = new CountDownLatch(1)
+
+    val listener = new LifeCycle.Listener {
+      def lifeCycleFailure(event: LifeCycle, cause: Throwable): Unit = ()
+      def lifeCycleStarted(event: LifeCycle): Unit = cdl.countDown()
+      def lifeCycleStarting(event: LifeCycle): Unit = ()
+      def lifeCycleStopped(event: LifeCycle): Unit = ()
+      def lifeCycleStopping(event: LifeCycle): Unit = ()
+    }
+
+    server.addLifeCycleListener(listener)
     server.start()
+    cdl.await()
 
   }
 }
@@ -73,4 +90,5 @@ object JettyMain {
 
     cssval.stop()
   }
+
 }

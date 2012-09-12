@@ -1,8 +1,5 @@
 import sbt._
 import sbt.Keys._
-// import com.github.siasia._
-// import WebPlugin._
-// import PluginKeys._
 import sbtassembly.Plugin._
 import AssemblyKeys._
 
@@ -14,11 +11,11 @@ object CSSValidator extends Build {
   lazy val cssValidator = Project(
     id = "css-validator-standalone",
     base = file("."),
-    settings = Defaults.defaultSettings /*++ webSettings*/ ++ assemblySettings ++ Seq(
+    settings = Defaults.defaultSettings ++ assemblySettings ++ Seq(
       organization := "org.w3",
-      version := "1.0-SNAPSHOT",
+      version := "1.0",
       scalaVersion := "2.9.2",
-      crossScalaVersions := Seq("2.9.1", "2.9.2"),
+      crossScalaVersions := Seq("2.9.2"),
       javacOptions ++= Seq("-Xlint:unchecked"),
       mainClass in assembly := Some("org.w3.cssvalidator.JettyMain"),
       jarName in assembly := "css-validator-standalone.jar",
