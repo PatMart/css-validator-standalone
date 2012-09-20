@@ -22,4 +22,4 @@ bin
 *.egp
 RDFValidator
 2002
-css-validator.war
+css-validator*.war
