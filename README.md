@@ -1,6 +1,8 @@
 CSS Validator Standalone
 ========================
 
+This project continues at https://github.com/w3c/validators
+
 The W3C CSS Validation service.
 
 This project packages the CSS Validator service so that it can easily be run locally.
